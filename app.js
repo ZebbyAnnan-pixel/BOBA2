@@ -21,11 +21,11 @@ async function generate() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",
         messages: [
           {
             role: "system",
-            content: "You are BOBA.ai. Generate ONLY clean HTML with inline CSS for an A4 assignment cover page. No explanations."
+            content: "You are BOBA.ai. Generate ONLY clean HTML with inline CSS for a beautiful A4 assignment cover page. No explanations. No markdown. Only HTML."
           },
           {
             role: "user",
@@ -37,23 +37,26 @@ async function generate() {
 
     const data = await res.json();
 
-    console.log("API RESPONSE:", data); // IMPORTANT DEBUG
+    console.log("Groq response:", data); // debug
 
-    if (!data.choices) {
+    // safety check
+    if (!data.choices || !data.choices[0]) {
       document.getElementById(loadingId).innerText =
-        "Error: API not responding. Check console (F12)";
+        "Error: Invalid response from AI. Check console (F12)";
       return;
     }
 
     let html = data.choices[0].message.content;
+
+    // remove accidental code blocks
     html = html.replace(/```html|```/g, "");
 
     document.getElementById(loadingId).outerHTML =
-      `<div class="msg bot">${html}</div>`;
+      `<div class="msg bot"><div class="cover">${html}</div></div>`;
 
   } catch (err) {
-    document.getElementById(loadingId).innerText =
-      "Network error. Check API key or internet.";
     console.error(err);
+    document.getElementById(loadingId).innerText =
+      "Network/API error. Check API key or internet.";
   }
 }
