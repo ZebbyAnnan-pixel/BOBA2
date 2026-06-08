@@ -1,38 +1,65 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0f0f0f;
+  background: #0d0d0d;
   color: white;
+}
+
+.app {
+  max-width: 800px;
+  margin: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
   text-align: center;
+  padding: 20px;
+  border-bottom: 1px solid #222;
 }
 
-.container {
-  padding: 40px;
+#chat {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
 }
 
-h1 {
-  font-size: 40px;
-}
-
-.tagline {
-  color: #aaa;
+.message {
   margin-bottom: 20px;
 }
 
-.input-box {
-  margin-bottom: 20px;
+.user {
+  text-align: right;
+  color: #4f9cff;
+}
+
+.bot {
+  text-align: left;
+}
+
+.cover {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.input-area {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #222;
 }
 
 input {
+  flex: 1;
   padding: 12px;
-  width: 320px;
-  border: none;
   border-radius: 8px;
+  border: none;
 }
 
 button {
-  padding: 12px 16px;
   margin-left: 10px;
+  padding: 12px 16px;
   border: none;
   border-radius: 8px;
   background: #4f46e5;
@@ -44,17 +71,6 @@ button:hover {
   background: #4338ca;
 }
 
-#preview {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-}
-
-.hidden {
-  display: none;
-}
-
-#downloadBtn {
-  margin-top: 20px;
-  background: #10b981;
+.loading {
+  opacity: 0.7;
 }
