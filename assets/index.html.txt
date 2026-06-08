@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BOBA.ai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>BOBA.ai 🎨</h1>
+  <p class="tagline">Design your assignment cover in seconds</p>
+
+  <div class="input-box">
+    <input id="prompt" placeholder="e.g. Blue modern physics cover with name Anandhu" />
+    <button onclick="generate()">Generate</button>
+  </div>
+
+  <div id="loading" class="hidden">Generating...</div>
+
+  <div id="preview"></div>
+
+  <button id="downloadBtn" class="hidden" onclick="download()">Download</button>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
