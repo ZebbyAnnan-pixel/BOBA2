@@ -1,14 +1,24 @@
 async function generate() {
-  const prompt = document.getElementById("prompt").value;
-  const preview = document.getElementById("preview");
-  const loading = document.getElementById("loading");
-  const downloadBtn = document.getElementById("downloadBtn");
+  const input = document.getElementById("prompt");
+  const chat = document.getElementById("chat");
 
-  if (!prompt) return;
+  const userText = input.value.trim();
+  if (!userText) return;
 
-  loading.classList.remove("hidden");
-  preview.innerHTML = "";
-  downloadBtn.classList.add("hidden");
+  // Show user message
+  chat.innerHTML += `
+    <div class="message user">${userText}</div>
+  `;
+
+  input.value = "";
+
+  // Show loading message
+  const loadingId = "load-" + Date.now();
+  chat.innerHTML += `
+    <div id="${loadingId}" class="message bot loading">Generating...</div>
+  `;
+
+  chat.scrollTop = chat.scrollHeight;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -22,33 +32,34 @@ async function generate() {
         messages: [
           {
             role: "system",
-            content: "You are BOBA.ai. Generate ONLY clean HTML with inline CSS for a beautiful A4 assignment cover page. No explanations. No markdown. Just HTML."
+            content: "Generate ONLY clean HTML with inline CSS for a centered A4 assignment cover page. No text explanation. No markdown."
           },
           {
             role: "user",
-            content: prompt
+            content: userText
           }
         ]
       })
     });
 
     const data = await response.json();
+
     let html = data.choices[0].message.content;
 
-    // Clean accidental markdown
+    // Clean markdown if exists
     html = html.replace(/```html|```/g, "");
 
-    preview.innerHTML = html;
-    downloadBtn.classList.remove("hidden");
+    // Replace loading with result
+    document.getElementById(loadingId).outerHTML = `
+      <div class="message bot">
+        <div class="cover">${html}</div>
+      </div>
+    `;
 
   } catch (err) {
-    preview.innerHTML = "Error generating design.";
+    document.getElementById(loadingId).innerText = "Error generating design.";
     console.error(err);
   }
 
-  loading.classList.add("hidden");
-}
-
-function download() {
-  window.print();
+  chat.scrollTop = chat.scrollHeight;
 }
