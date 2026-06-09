@@ -59,7 +59,7 @@ async function generate() {
 
           if (content) {
             fullText += content;
-            msgDiv.innerText = fullText; // typing effect
+            msgDiv.innerHTML = fullText.replace(/\n/g, "<br>");
           }
         } catch (err) {
           console.error(err);
