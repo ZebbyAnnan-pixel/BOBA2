@@ -5,58 +5,66 @@ async function generate() {
   const text = input.value.trim();
   if (!text) return;
 
-  // Show user message
   chat.innerHTML += `<div class="msg user">${text}</div>`;
   input.value = "";
 
-  // Loading message
-  const loadingId = "load-" + Date.now();
-  chat.innerHTML += `<div id="${loadingId}" class="msg bot">Generating...</div>`;
+  const msgId = "msg-" + Date.now();
+  chat.innerHTML += `<div id="${msgId}" class="msg bot"></div>`;
 
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer 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",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "system",
-            content: "You are BOBA.ai. Generate ONLY clean HTML with inline CSS for a beautiful A4 assignment cover page. No explanations. No markdown. Only HTML."
-          },
-          {
-            role: "user",
-            content: text
+  const msgDiv = document.getElementById(msgId);
+
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer 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",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful AI assistant. Reply naturally."
+        },
+        {
+          role: "user",
+          content: text
+        }
+      ],
+      stream: true
+    })
+  });
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+
+  let fullText = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const chunk = decoder.decode(value);
+    const lines = chunk.split("\n");
+
+    for (let line of lines) {
+      if (line.startsWith("data: ")) {
+        const data = line.replace("data: ", "");
+
+        if (data === "[DONE]") return;
+
+        try {
+          const json = JSON.parse(data);
+          const content = json.choices[0].delta?.content;
+
+          if (content) {
+            fullText += content;
+            msgDiv.innerText = fullText; // typing effect
           }
-        ]
-      })
-    });
-
-    const data = await res.json();
-
-    console.log("Groq response:", data); // debug
-
-    // safety check
-    if (!data.choices || !data.choices[0]) {
-      document.getElementById(loadingId).innerText =
-        "Error: Invalid response from AI. Check console (F12)";
-      return;
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }
-
-    let html = data.choices[0].message.content;
-
-    // remove accidental code blocks
-    html = html.replace(/```html|```/g, "");
-
-    document.getElementById(loadingId).outerHTML =
-      `<div class="msg bot"><div class="cover">${html}</div></div>`;
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById(loadingId).innerText =
-      "Network/API error. Check API key or internet.";
   }
 }
